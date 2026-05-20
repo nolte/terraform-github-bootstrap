@@ -17,17 +17,16 @@ variable "repositories" {
   EOT
 
   type = map(object({
-    description   = optional(string)
-    homepage_url  = optional(string)
-    visibility    = optional(string, "public") # public | private
-    is_template   = optional(bool, false)
-    archived      = optional(bool, false)
-    has_issues    = optional(bool, true)
-    has_projects  = optional(bool, true)
-    has_wiki      = optional(bool, false)
-    has_downloads = optional(bool, false)
-    topics        = optional(list(string), [])
-    auto_init     = optional(bool, false)
+    description  = optional(string)
+    homepage_url = optional(string)
+    visibility   = optional(string, "public") # public | private
+    is_template  = optional(bool, false)
+    archived     = optional(bool, false)
+    has_issues   = optional(bool, true)
+    has_projects = optional(bool, true)
+    has_wiki     = optional(bool, false)
+    topics       = optional(list(string), [])
+    auto_init    = optional(bool, false)
 
     # Default branch — the Probot Settings App also writes this; Terraform
     # only sets it when explicitly given here, otherwise the field is left
