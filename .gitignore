@@ -1,0 +1,35 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl.backup
+*.tfstate
+*.tfstate.*
+*.tfvars
+!example.tfvars
+!*.example.tfvars
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Local environment
+.env
+.envrc
+
+# Python virtualenv (docs tooling)
+.venv/
+
+# MkDocs build output
+site/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Task local state
+.task/

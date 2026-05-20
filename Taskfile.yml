@@ -1,0 +1,55 @@
+---
+version: "3"
+
+vars:
+  TF_ROOTS:
+    sh: find terraform -maxdepth 2 -name '*.tf' -printf '%h\n' 2>/dev/null | sort -u
+
+tasks:
+  default:
+    cmds:
+      - task -l
+    silent: true
+
+  lint:
+    desc: Run pre-commit across all files
+    cmds:
+      - pre-commit run --all-files
+
+  test:
+    desc: terraform validate across every root module
+    cmds:
+      - task: tf:validate
+
+  docs:
+    desc: Build the MkDocs site (strict)
+    cmds:
+      - mkdocs build --strict
+
+  tf:fmt:
+    desc: terraform fmt -recursive terraform/
+    cmds:
+      - terraform fmt -recursive terraform/
+
+  tf:validate:
+    desc: terraform init -backend=false && validate per root module
+    cmds:
+      - |
+        set -euo pipefail
+        for root in $(find terraform -maxdepth 2 -name '*.tf' -printf '%h\n' | sort -u); do
+          echo "==> $root"
+          terraform -chdir="$root" init -backend=false -input=false -no-color
+          terraform -chdir="$root" validate -no-color
+        done
+
+  tf:plan:
+    desc: terraform plan for the org root module (requires GITHUB_TOKEN with admin:org)
+    cmds:
+      - terraform -chdir=terraform/org init -input=false
+      - terraform -chdir=terraform/org plan
+
+  tf:apply:
+    desc: terraform apply for the org root module (human-gated)
+    cmds:
+      - terraform -chdir=terraform/org init -input=false
+      - terraform -chdir=terraform/org apply

@@ -1,0 +1,25 @@
+---
+name: release-publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (must match an open draft)
+        required: true
+        type: string
+      dry-run:
+        description: Validate only, do not publish
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-publish.yml@v1.1.18
+    with:
+      tag: ${{ inputs.tag }}
+      dry-run: ${{ inputs.dry-run }}

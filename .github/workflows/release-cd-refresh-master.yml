@@ -1,0 +1,15 @@
+---
+name: release-cd-refresh-master
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-cd-refresh-master.yml@v1.1.18
+    with:
+      target_branch: main

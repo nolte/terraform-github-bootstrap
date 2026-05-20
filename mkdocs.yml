@@ -1,0 +1,34 @@
+---
+site_name: terraform-github-bootstrap
+site_description: Bootstrap the nolte GitHub org via Terraform.
+site_url: https://nolte.github.io/terraform-github-bootstrap/
+repo_url: https://github.com/nolte/terraform-github-bootstrap
+repo_name: nolte/terraform-github-bootstrap
+edit_uri: edit/develop/docs/
+
+docs_dir: docs/en
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: blue grey
+      accent: indigo
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.details
+
+nav:
+  - Home: index.md

@@ -1,0 +1,10 @@
+---
+# Repository settings sync via https://probot.github.io/apps/settings/
+# Portfolio defaults: nolte/gh-plumbing:.github/commons-settings.yml
+_extends: nolte/gh-plumbing:.github/commons-settings.yml
+
+repository:
+  name: terraform-github-bootstrap
+  description: "Bootstrap the nolte GitHub org via Terraform: org settings, teams, branch protection rulesets."
+  homepage: https://github.com/nolte/terraform-github-bootstrap
+  topics: terraform,github,iac,bootstrap,nolte
