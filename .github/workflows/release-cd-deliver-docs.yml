@@ -19,3 +19,5 @@ jobs:
     uses: nolte/gh-plumbing/.github/workflows/reusable-mkdocs.yaml@v1.1.18
     with:
       requirements: docs/requirements.txt
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
