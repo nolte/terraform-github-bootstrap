@@ -17,10 +17,9 @@ resource "github_repository" "managed" {
   is_template = each.value.is_template
   archived    = each.value.archived
 
-  has_issues    = each.value.has_issues
-  has_projects  = each.value.has_projects
-  has_wiki      = each.value.has_wiki
-  has_downloads = each.value.has_downloads
+  has_issues   = each.value.has_issues
+  has_projects = each.value.has_projects
+  has_wiki     = each.value.has_wiki
 
   topics    = each.value.topics
   auto_init = each.value.auto_init
