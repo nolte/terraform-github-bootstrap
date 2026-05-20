@@ -21,6 +21,9 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: latest
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
