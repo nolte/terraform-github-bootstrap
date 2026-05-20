@@ -1,26 +1,27 @@
-# Organisation-wide repository rulesets.
-#
-# Each ruleset targets a set of refs (branches or tags) across an explicit
-# repository list and codifies the protection policy declared per repo in
-# `nolte/gh-plumbing:.github/commons-settings.yml` (`develop` and `master`).
+# Per-repo repository rulesets (modern alternative to classic branch protection).
 #
 # Source of truth:
-#   https://registry.terraform.io/providers/integrations/github/latest/docs/resources/organization_ruleset
+#   https://registry.terraform.io/providers/integrations/github/latest/docs/resources/repository_ruleset
 
-resource "github_organization_ruleset" "managed" {
-  for_each = var.rulesets
+locals {
+  rulesets = {
+    for name, cfg in var.repositories :
+    name => cfg.ruleset
+    if cfg.ruleset != null
+  }
+}
 
-  name        = each.key
+resource "github_repository_ruleset" "default_protection" {
+  for_each = local.rulesets
+
+  repository  = github_repository.managed[each.key].name
+  name        = "default-branch-protection"
   target      = each.value.target
   enforcement = each.value.enforcement
 
   conditions {
     ref_name {
       include = each.value.include_refs
-      exclude = []
-    }
-    repository_name {
-      include = each.value.include_repos
       exclude = []
     }
   }

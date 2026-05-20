@@ -43,13 +43,13 @@ tasks:
         done
 
   tf:plan:
-    desc: terraform plan for the org root module (requires GITHUB_TOKEN with admin:org)
+    desc: terraform plan for the repos root module (requires GITHUB_TOKEN with `repo` scope)
     cmds:
-      - terraform -chdir=terraform/org init -input=false
-      - terraform -chdir=terraform/org plan
+      - terraform -chdir=terraform/repos init -input=false
+      - terraform -chdir=terraform/repos plan
 
   tf:apply:
-    desc: terraform apply for the org root module (human-gated)
+    desc: terraform apply for the repos root module (human-gated)
     cmds:
-      - terraform -chdir=terraform/org init -input=false
-      - terraform -chdir=terraform/org apply
+      - terraform -chdir=terraform/repos init -input=false
+      - terraform -chdir=terraform/repos apply

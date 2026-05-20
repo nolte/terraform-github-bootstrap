@@ -5,6 +5,6 @@ _extends: nolte/gh-plumbing:.github/commons-settings.yml
 
 repository:
   name: terraform-github-bootstrap
-  description: "Bootstrap the nolte GitHub org via Terraform: org settings, teams, branch protection rulesets."
+  description: "Manage the nolte GitHub account as Terraform: repository inventory and repository rulesets."
   homepage: https://github.com/nolte/terraform-github-bootstrap
   topics: terraform,github,iac,bootstrap,nolte
