@@ -42,7 +42,9 @@ fi
 
 TF_VAR_app_id="$(gopass show -o "${GOPASS_PATH}/appid")"
 TF_VAR_app_slug="$(gopass show -o "${GOPASS_PATH}/slug")"
-TF_VAR_app_private_key="$(gopass show -o "${GOPASS_PATH}/private_key")"
+# `-n` (no-parsing) preserves the full multi-line PEM body; `-o` (oneline)
+# would silently truncate the key to its `-----BEGIN ...-----` header line.
+TF_VAR_app_private_key="$(gopass show -n "${GOPASS_PATH}/private_key")"
 GITHUB_TOKEN="$(gh auth token)"
 
 export TF_VAR_app_id TF_VAR_app_slug TF_VAR_app_private_key GITHUB_TOKEN
