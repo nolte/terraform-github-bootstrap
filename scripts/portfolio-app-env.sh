@@ -9,13 +9,19 @@
 # them as TF_VAR_* so Terraform picks them up without writing them to
 # disk. GITHUB_TOKEN is read from `gh auth token` for convenience.
 #
-# Prerequisites:
-#   - gopass entries:
-#       github/apps/nolte-portfolio-bot/app-id        (numeric App ID)
-#       github/apps/nolte-portfolio-bot/private-key   (PEM, generated in
-#                                                      the App's UI and
-#                                                      piped into gopass)
-#   - gh CLI authenticated as the account that owns var.consumer_repositories.
+# Prerequisites (one-time, all manual — no GitHub API for any of these):
+#   1. Register the App at https://github.com/settings/apps/new
+#   2. Generate a private key (.pem) on the App's settings page
+#   3. Install the App in every repo listed under var.consumer_repositories
+#   4. Persist the credentials into gopass:
+#        gopass insert    github/apps/nolte-portfolio-bot/app-id
+#        gopass insert -m github/apps/nolte-portfolio-bot/private-key < key.pem
+#
+# See docs/en/portfolio-app.md for the full operator runbook.
+#
+# Per-session prerequisites:
+#   - gh CLI authenticated as the account that owns var.consumer_repositories
+#   - gopass unlocked
 set -euo pipefail
 
 APP_SLUG="${PORTFOLIO_APP_SLUG:-nolte-portfolio-bot}"

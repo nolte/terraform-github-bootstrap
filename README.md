@@ -50,11 +50,15 @@ scripts/                # operator helpers (gopass → TF_VAR_* env loaders)
 
 ### portfolio-app credentials
 
-The portfolio-app module needs `app_id`, `app_slug`, and `app_private_key` — these come from a GitHub App that is **registered manually** (no API for that). The recommended flow:
+The portfolio-app module needs a GitHub App that is **registered manually** — there is no GitHub API for App creation or private-key generation. Five manual steps before the first `task tf:apply:portfolio-app`:
+
+1. **Register the App** at <https://github.com/settings/apps/new>. Permissions and webhook settings are documented at [`docs/en/portfolio-app.md`](docs/en/portfolio-app.md) and in the [upstream setup guide](https://github.com/nolte/gh-plumbing/blob/develop/docs/en/portfolio-app/setup.md).
+2. **Generate a private key** (`.pem`) on the App's settings page.
+3. **Note the numeric App ID** (visible on the App's settings page).
+4. **Install the App** in every consumer repository (default: `terraform-github-bootstrap`, `gh-plumbing`, `claude-shared`).
+5. **Persist credentials in gopass** and let Terraform read them via `TF_VAR_*`:
 
 ```sh
-# One-time: register the App at https://github.com/settings/apps/new
-# Then download the private key and persist it in gopass:
 gopass insert    github/apps/nolte-portfolio-bot/app-id          # numeric App ID
 gopass insert -m github/apps/nolte-portfolio-bot/private-key < downloaded.pem
 shred -u downloaded.pem
@@ -64,7 +68,7 @@ source scripts/portfolio-app-env.sh
 task tf:plan:portfolio-app
 ```
 
-The script exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, and `GITHUB_TOKEN`; nothing touches tfvars or the repo.
+`scripts/portfolio-app-env.sh` exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, and `GITHUB_TOKEN`; nothing touches tfvars or the repo. Full operator runbook at [`docs/en/portfolio-app.md`](docs/en/portfolio-app.md).
 
 > **Spec note.** `spec/project/project-structure/` does not currently list `terraform/` as a sanctioned top-level source tree (only `src/`, `custom_components/`, `.claude-plugin/`, `playbooks/`+`roles/`). This repository uses `terraform/` as a conscious extension — analogous to the Ansible exception. Tracked under `spec/source-layout-extension.md` once the spec amendment lands upstream.
 

@@ -32,3 +32,4 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Portfolio App: portfolio-app.md
