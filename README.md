@@ -41,9 +41,30 @@ State backend is currently **local** (`terraform.tfstate` next to the module). W
 ```
 terraform/
   repos/                # repository inventory + per-repo rulesets
+  portfolio-app/        # wrapper around gh-plumbing//terraform/portfolio-app
+                        # provisions per-repo PORTFOLIO_APP_ID + PORTFOLIO_APP_PRIVATE_KEY
 docs/                   # MkDocs source (English)
 .github/                # Probot configs + reusable-workflow consumers
+scripts/                # operator helpers (gopass → TF_VAR_* env loaders)
 ```
+
+### portfolio-app credentials
+
+The portfolio-app module needs `app_id`, `app_slug`, and `app_private_key` — these come from a GitHub App that is **registered manually** (no API for that). The recommended flow:
+
+```sh
+# One-time: register the App at https://github.com/settings/apps/new
+# Then download the private key and persist it in gopass:
+gopass insert    github/apps/nolte-portfolio-bot/app-id          # numeric App ID
+gopass insert -m github/apps/nolte-portfolio-bot/private-key < downloaded.pem
+shred -u downloaded.pem
+
+# Each session before plan/apply:
+source scripts/portfolio-app-env.sh
+task tf:plan:portfolio-app
+```
+
+The script exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, and `GITHUB_TOKEN`; nothing touches tfvars or the repo.
 
 > **Spec note.** `spec/project/project-structure/` does not currently list `terraform/` as a sanctioned top-level source tree (only `src/`, `custom_components/`, `.claude-plugin/`, `playbooks/`+`roles/`). This repository uses `terraform/` as a conscious extension — analogous to the Ansible exception. Tracked under `spec/source-layout-extension.md` once the spec amendment lands upstream.
 

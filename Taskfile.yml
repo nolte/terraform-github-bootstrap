@@ -53,3 +53,15 @@ tasks:
     cmds:
       - terraform -chdir=terraform/repos init -input=false
       - terraform -chdir=terraform/repos apply
+
+  tf:plan:portfolio-app:
+    desc: terraform plan for the portfolio-app root module (requires TF_VAR_app_id, TF_VAR_app_private_key, GITHUB_TOKEN)
+    cmds:
+      - terraform -chdir=terraform/portfolio-app init -input=false
+      - terraform -chdir=terraform/portfolio-app plan
+
+  tf:apply:portfolio-app:
+    desc: terraform apply for the portfolio-app root module (human-gated)
+    cmds:
+      - terraform -chdir=terraform/portfolio-app init -input=false
+      - terraform -chdir=terraform/portfolio-app apply
