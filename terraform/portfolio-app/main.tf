@@ -5,9 +5,8 @@
 # The module is pinned to `?ref=develop` because the module itself
 # only landed after the v1.1.18 release tag. Repin to the next tagged
 # release once it ships (search for the ref string below).
-# Conscious develop-pin until the first tagged gh-plumbing release that ships
-# the portfolio-app module (v1.1.18 does not). Repin to that release tag.
-# tflint-ignore: terraform_module_pinned_source
+# The corresponding tflint rule `terraform_module_pinned_source` is
+# disabled in `.tflint.hcl` until that repin happens.
 module "portfolio_app" {
   source = "github.com/nolte/gh-plumbing//terraform/portfolio-app?ref=develop"
 
