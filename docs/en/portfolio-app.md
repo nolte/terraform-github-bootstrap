@@ -22,20 +22,25 @@ The permissions list, the exact webhook setting, and the rationale behind the Ap
 
 ## One-time operator setup
 
-After steps 1–5 above are done in the GitHub UI, persist the credentials in gopass so neither `terraform.tfvars` nor any shell history ever sees them in cleartext:
+After steps 1–5 above are done in the GitHub UI, persist the credentials in gopass so neither `terraform.tfvars` nor any shell history ever sees them in cleartext. The canonical store path follows the URL-based gopass convention `internet/github.com/<owner>/apps/<app-slug>/`:
 
 ```sh
+GP=internet/github.com/nolte/apps/nolte-portfolio-app
+
 # Numeric App ID — visible on the App's settings page header.
-gopass insert github/apps/nolte-portfolio-bot/app-id
+gopass insert "$GP/appid"
+
+# App slug — the path segment after /apps/ on the App's settings page.
+gopass insert "$GP/slug"
 
 # Private key — paste the entire PEM (BEGIN/END lines included).
-gopass insert -m github/apps/nolte-portfolio-bot/private-key < downloaded.pem
+gopass insert -m "$GP/private_key" < downloaded.pem
 
 # Wipe the local PEM file once gopass has it.
 shred -u downloaded.pem
 ```
 
-The default slug is `nolte-portfolio-bot`; if you pick a different one, set `var.app_slug` accordingly and replace the path under `github/apps/<slug>/` in gopass.
+The default slug is `nolte-portfolio-app`. If you pick a different one, override the gopass prefix via the `PORTFOLIO_APP_GOPASS_PATH` env var before sourcing `scripts/portfolio-app-env.sh`, and set `var.app_slug` accordingly in your tfvars (or leave it to the env loader, which pulls the slug from gopass).
 
 ## Per-session workflow
 

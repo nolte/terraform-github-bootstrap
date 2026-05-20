@@ -5,18 +5,18 @@ variable "owner" {
 }
 
 variable "app_id" {
-  description = "Numeric ID of the portfolio GitHub App. Set via TF_VAR_app_id (typically `gopass show -o github/apps/<slug>/app-id`)."
+  description = "Numeric ID of the portfolio GitHub App. Set via TF_VAR_app_id (typically `gopass show -o internet/github.com/nolte/apps/<app>/appid`)."
   type        = string
 }
 
 variable "app_slug" {
-  description = "Slug of the portfolio GitHub App (the path segment after `/apps/`)."
+  description = "Slug of the portfolio GitHub App (the path segment after `/apps/`). Set via TF_VAR_app_slug (typically `gopass show -o internet/github.com/nolte/apps/<app>/slug`); the default below matches the nolte-managed App."
   type        = string
-  default     = "nolte-portfolio-bot"
+  default     = "nolte-portfolio-app"
 }
 
 variable "app_private_key" {
-  description = "PEM-encoded private key for the portfolio GitHub App. Set via TF_VAR_app_private_key (typically `gopass show -o github/apps/<slug>/private-key`). Marked sensitive."
+  description = "PEM-encoded private key for the portfolio GitHub App. Set via TF_VAR_app_private_key (typically `gopass show -o internet/github.com/nolte/apps/<app>/private_key`). Marked sensitive."
   type        = string
   sensitive   = true
 }
