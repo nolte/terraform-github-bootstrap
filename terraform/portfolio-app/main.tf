@@ -6,6 +6,9 @@
 # only landed after the v1.1.18 release tag. Repin to the next tagged
 # release once it ships (search for the ref string below).
 module "portfolio_app" {
+  # tflint-ignore: terraform_module_pinned_source
+  # Conscious develop-pin until the first tagged gh-plumbing release that ships
+  # the portfolio-app module (v1.1.18 does not). Repin to that release tag.
   source = "github.com/nolte/gh-plumbing//terraform/portfolio-app?ref=develop"
 
   # User mode — `nolte` is a personal user account, not an org.
