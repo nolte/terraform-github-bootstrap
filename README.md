@@ -59,8 +59,10 @@ The portfolio-app module needs a GitHub App that is **registered manually** — 
 5. **Persist credentials in gopass** and let Terraform read them via `TF_VAR_*`:
 
 ```sh
-gopass insert    github/apps/nolte-portfolio-bot/app-id          # numeric App ID
-gopass insert -m github/apps/nolte-portfolio-bot/private-key < downloaded.pem
+GP=internet/github.com/nolte/apps/nolte-portfolio-app
+gopass insert    "$GP/appid"                 # numeric App ID
+gopass insert    "$GP/slug"                  # e.g. nolte-portfolio-app
+gopass insert -m "$GP/private_key" < downloaded.pem
 shred -u downloaded.pem
 
 # Each session before plan/apply:

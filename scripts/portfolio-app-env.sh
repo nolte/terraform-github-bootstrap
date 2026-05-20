@@ -13,9 +13,11 @@
 #   1. Register the App at https://github.com/settings/apps/new
 #   2. Generate a private key (.pem) on the App's settings page
 #   3. Install the App in every repo listed under var.consumer_repositories
-#   4. Persist the credentials into gopass:
-#        gopass insert    github/apps/nolte-portfolio-bot/app-id
-#        gopass insert -m github/apps/nolte-portfolio-bot/private-key < key.pem
+#   4. Persist the credentials into gopass under the canonical store path
+#      `internet/github.com/nolte/apps/<app-slug>/`:
+#        gopass insert    internet/github.com/nolte/apps/nolte-portfolio-app/appid
+#        gopass insert    internet/github.com/nolte/apps/nolte-portfolio-app/slug
+#        gopass insert -m internet/github.com/nolte/apps/nolte-portfolio-app/private_key < key.pem
 #
 # See docs/en/portfolio-app.md for the full operator runbook.
 #
@@ -24,7 +26,9 @@
 #   - gopass unlocked
 set -euo pipefail
 
-APP_SLUG="${PORTFOLIO_APP_SLUG:-nolte-portfolio-bot}"
+# gopass store path. Override via PORTFOLIO_APP_GOPASS_PATH if the App lives
+# under a different prefix; the default matches the nolte-managed gopass tree.
+GOPASS_PATH="${PORTFOLIO_APP_GOPASS_PATH:-internet/github.com/nolte/apps/nolte-portfolio-app}"
 
 if ! command -v gopass >/dev/null 2>&1; then
   echo "error: gopass not in PATH" >&2
@@ -36,13 +40,17 @@ if ! command -v gh >/dev/null 2>&1; then
   return 1 2>/dev/null || exit 1
 fi
 
-TF_VAR_app_id="$(gopass show -o "github/apps/${APP_SLUG}/app-id")"
-TF_VAR_app_private_key="$(gopass show -o "github/apps/${APP_SLUG}/private-key")"
+TF_VAR_app_id="$(gopass show -o "${GOPASS_PATH}/appid")"
+TF_VAR_app_slug="$(gopass show -o "${GOPASS_PATH}/slug")"
+# `-n` (no-parsing) preserves the full multi-line PEM body; `-o` (oneline)
+# would silently truncate the key to its `-----BEGIN ...-----` header line.
+TF_VAR_app_private_key="$(gopass show -n "${GOPASS_PATH}/private_key")"
 GITHUB_TOKEN="$(gh auth token)"
 
-export TF_VAR_app_id TF_VAR_app_private_key GITHUB_TOKEN
+export TF_VAR_app_id TF_VAR_app_slug TF_VAR_app_private_key GITHUB_TOKEN
 
 echo "portfolio-app env loaded:"
 echo "  TF_VAR_app_id          = (${#TF_VAR_app_id} chars)"
+echo "  TF_VAR_app_slug        = ${TF_VAR_app_slug}"
 echo "  TF_VAR_app_private_key = (${#TF_VAR_app_private_key} chars, sensitive)"
 echo "  GITHUB_TOKEN           = (${#GITHUB_TOKEN} chars, sensitive)"
