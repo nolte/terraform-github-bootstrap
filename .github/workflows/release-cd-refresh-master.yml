@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   refresh:
-    uses: nolte/gh-plumbing/.github/workflows/reusable-release-cd-refresh-master.yml@v1.1.18
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-cd-refresh-master.yml@v1.1.19
     with:
       target_branch: main
     secrets:
