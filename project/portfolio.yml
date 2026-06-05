@@ -1,0 +1,23 @@
+# Portfolio manifest for nolte/terraform-github-bootstrap.
+# Schema: spec/portfolio/portfolio-management/ §Capability inventory per repository
+# Audience references resolve against AUDIENCES.md at the repo root.
+
+capabilities:
+  - name: github-config-as-code
+    description: >-
+      Terraform (integrations/github provider) that manages the nolte GitHub
+      account's repository inventory (existence, description, topics,
+      visibility, feature flags) and per-repo repository rulesets (modern branch
+      protection) as code — the deliberate complement to gh-plumbing's
+      Probot-managed per-repo settings.
+    audience:
+      - "Terraform operator / maintainer (nolte)"
+      - "The nolte GitHub account and its repositories"
+    status: active
+    rationale: >-
+      This repository owns the Terraform-managed GitHub configuration
+      (repository inventory and rulesets) in the portfolio, split cleanly from
+      gh-plumbing's Probot-managed settings per its README's source-of-truth
+      table.
+    peers:
+      - gh-plumbing:probot-commons-config
