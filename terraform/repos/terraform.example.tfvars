@@ -28,17 +28,32 @@ repositories = {
     }
   }
 
+  # gh-plumbing — example of enforcing required status checks via the ruleset
+  # instead of giving the Probot Settings App `administration: write`. Adopt
+  # existing state before the first apply:
+  #   terraform import github_repository.managed[\"gh-plumbing\"] gh-plumbing
+  # Notes: only `develop` is included (master is refreshed by an App-token
+  # cascade and this ruleset has no bypass_actors), and require_pull_request
+  # is false so the release-automation App-token direct push to develop is
+  # not blocked — the ruleset only adds the required checks.
+  gh-plumbing = {
+    description  = "Github Project plumbing"
+    homepage_url = "https://nolte.github.io/gh-plumbing/"
+    visibility   = "public"
+    topics       = ["github", "plumbing"]
+
+    ruleset = {
+      enforcement                   = "active"
+      include_refs                  = ["refs/heads/develop"]
+      require_pull_request          = false
+      require_status_checks_to_pass = true
+      required_status_checks        = ["static / Static CI Tests", "docs / MkDocs Build"]
+      require_linear_history        = false
+      block_force_pushes            = true
+      block_deletions               = true
+    }
+  }
+
   # Add further repos one at a time. Adopt each existing repo via
   # `terraform import github_repository.managed["<name>"] <name>` before apply.
-  # Example skeleton:
-  # claude-shared = {
-  #   description  = "Shared Claude Code skills and agents …"
-  #   visibility   = "public"
-  #   topics       = ["claude-code", "skills", "agents"]
-  #   ruleset = {
-  #     enforcement          = "active"
-  #     include_refs         = ["refs/heads/develop", "refs/heads/main"]
-  #     require_pull_request = true
-  #   }
-  # }
 }
