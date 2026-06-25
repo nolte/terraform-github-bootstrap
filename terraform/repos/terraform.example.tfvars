@@ -10,12 +10,10 @@ repositories = {
   # before the first apply, otherwise Terraform tries to create it.
   terraform-github-bootstrap = {
     description  = "Bootstrap the nolte GitHub org via Terraform: org settings, teams, branch protection rulesets."
-    homepage_url = "https://github.com/nolte/terraform-github-bootstrap"
     visibility   = "public"
     has_issues   = true
     has_projects = false
     has_wiki     = false
-    topics       = ["terraform", "github", "iac", "bootstrap", "nolte"]
 
     ruleset = {
       enforcement                     = "active"
@@ -37,10 +35,8 @@ repositories = {
   # is false so the release-automation App-token direct push to develop is
   # not blocked — the ruleset only adds the required checks.
   gh-plumbing = {
-    description  = "Github Project plumbing"
-    homepage_url = "https://nolte.github.io/gh-plumbing/"
-    visibility   = "public"
-    topics       = ["github", "plumbing"]
+    description = "Github Project plumbing"
+    visibility  = "public"
 
     ruleset = {
       enforcement                   = "active"

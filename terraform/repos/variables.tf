@@ -17,15 +17,16 @@ variable "repositories" {
   EOT
 
   type = map(object({
+    # NOTE: `homepage_url` and `topics` are deliberately absent — `.github/settings.yml`
+    # (Probot Settings) is the leading system for those. The github_repository
+    # resource ignore_changes them so Terraform never reconciles them.
     description  = optional(string)
-    homepage_url = optional(string)
     visibility   = optional(string, "public") # public | private
     is_template  = optional(bool, false)
     archived     = optional(bool, false)
     has_issues   = optional(bool, true)
     has_projects = optional(bool, true)
     has_wiki     = optional(bool, false)
-    topics       = optional(list(string), [])
     auto_init    = optional(bool, false)
 
     # Default branch — the Probot Settings App also writes this; Terraform
