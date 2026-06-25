@@ -1,6 +1,12 @@
 ---
 # Repository settings sync via https://probot.github.io/apps/settings/
 # Portfolio defaults: nolte/gh-plumbing:.github/commons-settings.yml
+#
+# Labels, merge strategy (squash-only), and delete_branch_on_merge are
+# inherited from the commons extension above and applied by the Probot
+# Settings App — this repo does not redeclare them. Modern branch
+# protection on `develop` is owned by Terraform rulesets (terraform/repos/),
+# which coexist with the classic protection from the commons `branches:` block.
 _extends: nolte/gh-plumbing:.github/commons-settings.yml
 
 repository:
