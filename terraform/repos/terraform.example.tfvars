@@ -43,10 +43,19 @@ repositories = {
       include_refs                  = ["refs/heads/develop"]
       require_pull_request          = false
       require_status_checks_to_pass = true
-      required_status_checks        = ["static / Static CI Tests", "docs / MkDocs Build"]
-      require_linear_history        = false
-      block_force_pushes            = true
-      block_deletions               = true
+      # Each context MUST equal the check-run name GitHub actually reports, or the
+      # ruleset shows it forever as "Expected — Waiting for status to be reported"
+      # and BLOCKS every PR:
+      #   - Reusable-workflow checks report as `caller-job / job`  -> keep the
+      #     prefix, e.g. "static / Static CI Tests", "docs / MkDocs Build".
+      #   - DIRECT-job checks report the BARE job name (no `workflow /` prefix),
+      #     e.g. "Static CI Tests" or "lint". Using the prefixed form for a
+      #     direct-job repo never matches.
+      # Verify with: gh api repos/<owner>/<repo>/commits/<sha>/check-runs --jq '.check_runs[].name'
+      required_status_checks = ["static / Static CI Tests", "docs / MkDocs Build"]
+      require_linear_history = false
+      block_force_pushes     = true
+      block_deletions        = true
     }
   }
 
