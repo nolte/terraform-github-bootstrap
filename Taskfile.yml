@@ -65,3 +65,15 @@ tasks:
     cmds:
       - terraform -chdir=terraform/portfolio-app init -input=false
       - terraform -chdir=terraform/portfolio-app apply
+
+  tf:plan:portfolio-ops:
+    desc: terraform plan for the portfolio-ops root module (needs `source scripts/portfolio-ops-env.sh` first)
+    cmds:
+      - terraform -chdir=terraform/portfolio-ops init -input=false
+      - terraform -chdir=terraform/portfolio-ops plan
+
+  tf:apply:portfolio-ops:
+    desc: terraform apply for the portfolio-ops root module (human-gated)
+    cmds:
+      - terraform -chdir=terraform/portfolio-ops init -input=false
+      - terraform -chdir=terraform/portfolio-ops apply
