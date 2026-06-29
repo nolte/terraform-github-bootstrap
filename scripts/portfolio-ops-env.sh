@@ -21,7 +21,11 @@
 # Per-session prerequisites:
 #   - gh CLI authenticated as the account that owns the repository
 #   - gopass unlocked
-set -euo pipefail
+#
+# This file is meant to be *sourced*, so it deliberately does NOT `set -euo
+# pipefail`: those options would persist in the caller's interactive shell and
+# turn the next failing command into a shell exit. Every failure path below is
+# handled explicitly with `return 1 2>/dev/null || exit 1` instead.
 
 # gopass store prefix for portfolio-ops secrets. Override via
 # PORTFOLIO_OPS_GOPASS_PREFIX if the secrets live under a different path; the

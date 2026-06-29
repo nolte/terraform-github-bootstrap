@@ -20,7 +20,9 @@ resource "github_actions_variable" "project_number" {
 }
 
 resource "github_actions_secret" "merge_queue_token" {
-  repository      = var.repository
-  secret_name     = "MERGE_QUEUE_TOKEN"
-  plaintext_value = var.merge_queue_token
+  repository  = var.repository
+  secret_name = "MERGE_QUEUE_TOKEN"
+  # `value` is the non-deprecated successor of `plaintext_value`; both
+  # `plaintext_value` and `encrypted_value` are deprecated in integrations/github 6.x.
+  value = var.merge_queue_token
 }
