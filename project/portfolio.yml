@@ -21,3 +21,47 @@ capabilities:
       table.
     peers:
       - gh-plumbing:probot-commons-config
+
+# tech_stack: repo-specific deltas vs the inherited portfolio baseline
+# (portfolio/tech-stack.yml). Schema: spec/portfolio/tech-stack/ §Per-repository block.
+tech_stack:
+  additions:
+    - name: terraform
+      kind: framework
+      group: build-tooling
+      version: "1.12.0"
+      role: Infrastructure-as-code engine provisioning the GitHub organisation and repositories.
+      status: active
+      lifecycle: build
+      source_of_truth: .tool-versions
+      rationale: >-
+        terraform is the IaC tool defining this repo's shape; the closed kind enum has no
+        infrastructure-as-code value, so it is classified as framework (the major tool defining
+        the repository) — operator may recategorise.
+    - name: hcl
+      kind: language
+      group: build-tooling
+      role: HashiCorp Configuration Language the Terraform modules under terraform/ are written in.
+      status: active
+      lifecycle: build
+      source_of_truth: terraform/
+    - name: tflint
+      kind: lint
+      group: quality
+      version: "0.55.0"
+      role: Terraform linter gating the IaC modules.
+      status: active
+      lifecycle: development
+      source_of_truth: .tool-versions
+      rationale: >-
+        acknowledged-missing-signal: tflint is pinned in .tool-versions and run in the pipeline,
+        but its config lives outside the standard lint-signal locations, so the signal check may
+        not auto-detect it.
+    - name: python
+      kind: language
+      group: build-tooling
+      version: "3.12.7"
+      role: Scripting language for the helper scripts under scripts/.
+      status: active
+      lifecycle: development
+      source_of_truth: .tool-versions
