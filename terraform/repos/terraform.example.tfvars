@@ -4,6 +4,12 @@
 
 owner = "nolte"
 
+# Numeric ID of the portfolio GitHub App. Only needed when a ruleset below sets
+# `bypass_portfolio_app = true`. Never commit the real ID — put it in the
+# git-ignored `terraform.tfvars`, or export it per session:
+#   export TF_VAR_portfolio_app_id="$(gopass show -o internet/github.com/nolte/apps/nolte-portfolio-app/appid)"
+# portfolio_app_id = "<app-id>"
+
 repositories = {
   # Dogfood: the bootstrap repo manages itself. Adopt existing state with
   #   terraform import github_repository.managed[\"terraform-github-bootstrap\"] terraform-github-bootstrap
@@ -56,6 +62,15 @@ repositories = {
       require_linear_history = false
       block_force_pushes     = true
       block_deletions        = true
+      # Not needed here: this ruleset never blocks the portfolio App, because it
+      # protects `develop` only and keeps require_pull_request = false. Set
+      # `bypass_portfolio_app = true` (and `portfolio_app_id` above) instead when
+      # a ruleset DOES stand in the App's way — e.g. it protects the branch that
+      # reusable-release-cd-refresh-master merges the tag into, or it requires a
+      # PR on the branch release-publish pushes the `chore(release)` commit to.
+      # A ruleset cannot inherit a bypass: one set through the GitHub UI reads as
+      # drift and gets deleted on the next apply.
+      # bypass_portfolio_app = true
     }
   }
 

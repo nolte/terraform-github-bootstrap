@@ -4,6 +4,22 @@ variable "owner" {
   default     = "nolte"
 }
 
+variable "portfolio_app_id" {
+  description = <<-EOT
+    Numeric ID of the portfolio GitHub App, used as the `Integration` bypass
+    actor for every ruleset that sets `bypass_portfolio_app = true`.
+
+    Required only when at least one ruleset opts into the bypass — otherwise
+    leave it null. Keep the value out of any committed file: set it in the
+    git-ignored `terraform.tfvars`, or export it per session from gopass:
+
+      export TF_VAR_portfolio_app_id="$(gopass show -o internet/github.com/nolte/apps/nolte-portfolio-app/appid)"
+  EOT
+
+  type    = string
+  default = null
+}
+
 variable "repositories" {
   description = <<-EOT
     Repositories managed by Terraform. Each entry produces a github_repository
@@ -47,6 +63,21 @@ variable "repositories" {
       require_signed_commits          = optional(bool, false)
       block_force_pushes              = optional(bool, true)
       block_deletions                 = optional(bool, true)
+
+      # Grant the portfolio GitHub App an `always` bypass on this ruleset.
+      #
+      # Required for every repo whose release automation pushes the
+      # `chore(release): <tag>` commit straight to a PROTECTED branch with the
+      # App token, or cascades the release tag into master/main
+      # (reusable-release-publish + reusable-release-cd-refresh-master). Without
+      # the bypass, a ruleset that carries `require_pull_request = true` or
+      # required status checks on that branch blocks the App push and the release
+      # fails. The alternative shape — protect `develop` only and keep
+      # `require_pull_request = false` (gh-plumbing, kamerplanter) — needs no
+      # bypass because the ruleset never stands in the App's way.
+      #
+      # The App ID itself comes from `var.portfolio_app_id`, never from here.
+      bypass_portfolio_app = optional(bool, false)
     }))
   }))
 

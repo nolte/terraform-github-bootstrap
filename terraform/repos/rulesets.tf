@@ -19,6 +19,21 @@ resource "github_repository_ruleset" "default_protection" {
   target      = each.value.target
   enforcement = each.value.enforcement
 
+  # Bypass actors are NOT inheritable from anywhere else: a ruleset bypass set
+  # through the GitHub UI shows up here as drift Terraform wants to delete, so
+  # every bypass a repo genuinely needs has to be declared in tfvars. See the
+  # `bypass_portfolio_app` note in variables.tf for when that is the case.
+  dynamic "bypass_actors" {
+    for_each = each.value.bypass_portfolio_app ? [1] : []
+    content {
+      actor_id   = tonumber(var.portfolio_app_id)
+      actor_type = "Integration"
+      # `always`, not `pull_request`: the App pushes directly to the protected
+      # branch, it does not open a PR that a `pull_request` bypass would cover.
+      bypass_mode = "always"
+    }
+  }
+
   conditions {
     ref_name {
       include = each.value.include_refs
@@ -54,6 +69,16 @@ resource "github_repository_ruleset" "default_protection" {
           }
         }
       }
+    }
+  }
+
+  lifecycle {
+    precondition {
+      # `can(tonumber(...))` rejects null, an empty string, and a non-numeric
+      # value alike — all three would otherwise fail deep inside the dynamic
+      # block with a message that names neither the repo nor the variable.
+      condition     = !each.value.bypass_portfolio_app || can(tonumber(var.portfolio_app_id))
+      error_message = "ruleset for '${each.key}' sets bypass_portfolio_app = true, so var.portfolio_app_id must be a numeric App ID (set it in terraform.tfvars or export TF_VAR_portfolio_app_id)."
     }
   }
 }
