@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Source this file before `task tf:plan:portfolio-app` / `tf:apply:portfolio-app`.
+# Source this file before `task tf:plan:portfolio-app` / `tf:apply:portfolio-app`,
+# and before `task tf:plan` / `tf:apply` whenever a ruleset in terraform/repos
+# sets `bypass_portfolio_app = true` (the repos module reads the same App ID
+# as TF_VAR_portfolio_app_id).
 #
 # Usage:
 #   source scripts/portfolio-app-env.sh
@@ -45,12 +48,16 @@ TF_VAR_app_slug="$(gopass show -o "${GOPASS_PATH}/slug")"
 # `-n` (no-parsing) preserves the full multi-line PEM body; `-o` (oneline)
 # would silently truncate the key to its `-----BEGIN ...-----` header line.
 TF_VAR_app_private_key="$(gopass show -n "${GOPASS_PATH}/private_key")"
+# Same App ID under the variable name the terraform/repos root module uses
+# for ruleset bypass actors (var.portfolio_app_id).
+TF_VAR_portfolio_app_id="${TF_VAR_app_id}"
 GITHUB_TOKEN="$(gh auth token)"
 
-export TF_VAR_app_id TF_VAR_app_slug TF_VAR_app_private_key GITHUB_TOKEN
+export TF_VAR_app_id TF_VAR_app_slug TF_VAR_app_private_key TF_VAR_portfolio_app_id GITHUB_TOKEN
 
 echo "portfolio-app env loaded:"
-echo "  TF_VAR_app_id          = (${#TF_VAR_app_id} chars)"
-echo "  TF_VAR_app_slug        = ${TF_VAR_app_slug}"
-echo "  TF_VAR_app_private_key = (${#TF_VAR_app_private_key} chars, sensitive)"
-echo "  GITHUB_TOKEN           = (${#GITHUB_TOKEN} chars, sensitive)"
+echo "  TF_VAR_app_id           = (${#TF_VAR_app_id} chars)"
+echo "  TF_VAR_app_slug         = ${TF_VAR_app_slug}"
+echo "  TF_VAR_app_private_key  = (${#TF_VAR_app_private_key} chars, sensitive)"
+echo "  TF_VAR_portfolio_app_id = (${#TF_VAR_portfolio_app_id} chars)"
+echo "  GITHUB_TOKEN            = (${#GITHUB_TOKEN} chars, sensitive)"

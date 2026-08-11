@@ -7,7 +7,7 @@ Manage parts of the [`nolte`](https://github.com/nolte) GitHub user account as T
 This repository owns:
 
 - **Repository inventory** — which repositories exist on `nolte`, their description, topics, visibility, `has_issues` / `has_wiki` / `has_projects` flags.
-- **Per-repository rulesets** — modern branch-protection via `github_repository_ruleset`.
+- **Per-repository rulesets** — modern branch-protection via `github_repository_ruleset`, including the bypass actor a repo's release automation needs when its ruleset protects the branch the portfolio App pushes to.
 - **Portfolio App footprint** — per-repo `PORTFOLIO_APP_ID` variable and `PORTFOLIO_APP_PRIVATE_KEY` secret on consumer repos (see [Portfolio App](portfolio-app.md)).
 - **Portfolio Ops wiring** — Actions variables and secrets for the `gh-portfolio-ops` automation repo, starting with the PR merge-queue board (see [Portfolio Ops](portfolio-ops.md)).
 
