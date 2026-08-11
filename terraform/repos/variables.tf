@@ -10,13 +10,16 @@ variable "portfolio_app_id" {
     actor for every ruleset that sets `bypass_portfolio_app = true`.
 
     Required only when at least one ruleset opts into the bypass — otherwise
-    leave it null. Keep the value out of any committed file: set it in the
-    git-ignored `terraform.tfvars`, or export it per session from gopass:
+    leave it null. The App ID is a non-secret identifier (unlike the App's
+    private key, which never leaves gopass), but keep it out of committed
+    files anyway: put it in the git-ignored `terraform.tfvars`, or source it
+    per session from gopass via the shared env loader, which exports it
+    alongside the portfolio-app credentials:
 
-      export TF_VAR_portfolio_app_id="$(gopass show -o internet/github.com/nolte/apps/nolte-portfolio-app/appid)"
+      source scripts/portfolio-app-env.sh   # exports TF_VAR_portfolio_app_id
   EOT
 
-  type    = string
+  type    = number
   default = null
 }
 

@@ -16,7 +16,7 @@ Terraform can only manage the App's **footprint** in consumer repositories. The 
 | 6. Persist App ID + private key in gopass | local shell | **manual (you), one-time** |
 | 7. Create per-repo `PORTFOLIO_APP_ID` Actions variable | github_actions_variable | **Terraform** |
 | 8. Create per-repo `PORTFOLIO_APP_PRIVATE_KEY` Actions secret | github_actions_secret | **Terraform** |
-| 9. (Optional, Phase 2) Branch-protection bypass for the App | github_branch_protection | **Terraform** (after operator opts in) |
+| 9. (Optional, per repo) Ruleset bypass for the App on protected release branches | `github_repository_ruleset` `bypass_actors` in `terraform/repos` | **Terraform** (after operator opts in) |
 
 The permissions list, the exact webhook setting, and the rationale behind the App-token cascade are documented once at [`nolte/gh-plumbing/docs/en/portfolio-app/setup.md`](https://github.com/nolte/gh-plumbing/blob/develop/docs/en/portfolio-app/setup.md) — do not duplicate them here.
 
@@ -44,7 +44,7 @@ The default slug is `nolte-portfolio-app`. If you pick a different one, override
 
 ## Per-session workflow
 
-`scripts/portfolio-app-env.sh` is the bridge between gopass and Terraform. It exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, and `GITHUB_TOKEN` — all three are read fresh from gopass / `gh auth token` on every session:
+`scripts/portfolio-app-env.sh` is the bridge between gopass and Terraform. It exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, `TF_VAR_portfolio_app_id` (the same App ID under the variable name the `terraform/repos` ruleset-bypass uses), and `GITHUB_TOKEN` — all read fresh from gopass / `gh auth token` on every session:
 
 ```sh
 source scripts/portfolio-app-env.sh
@@ -54,14 +54,11 @@ task tf:apply:portfolio-app         # human-gated apply
 
 After the apply, the consumer repositories listed in `var.consumer_repositories` (defaults: `terraform-github-bootstrap`, `gh-plumbing`, `claude-shared`) have the variable and secret in place. The reusable workflows in `nolte/gh-plumbing` then auto-detect them via the `vars.PORTFOLIO_APP_ID != ''` switch and mint an App-installation token instead of falling back to `GITHUB_TOKEN`.
 
-## Phase 0 → Phase 2
+## Protected-branch bypass (ruleset-based)
 
-The wrapper module defaults to `enable_branch_bypass = false` (Phase 0): variable and secret only. Flipping to Phase 2 (`enable_branch_bypass = true`) declares the App as a branch-protection-bypass actor on `var.protected_branches`. Per the upstream module's rollout doc, do this **only after**:
+The bypass the App needs on protected release branches is **not** managed through this wrapper module (the upstream `enable_branch_bypass` / `github_branch_protection` Phase-2 path is unused here — classic branch protection stays owned by Probot Settings). Instead, `terraform/repos` declares the App as an `always` `Integration` bypass actor directly on a repo's ruleset via the per-repo `bypass_portfolio_app = true` flag, with the App ID supplied as `var.portfolio_app_id` (exported by this page's env loader as `TF_VAR_portfolio_app_id`).
 
-- The App is installed in every consumer repository (step 5 of the manual checklist).
-- A cross-repository security review of the App's permissions has happened.
-
-When in doubt, leave Phase 2 off — the cascade gap closes already with Phase 0 for the workflows that actively read `vars.PORTFOLIO_APP_ID`.
+Opt a repo in **only** when its ruleset protects a branch the release automation writes with the App token — see the bypass-actors section in `CLAUDE.md` for the exact criterion and the caveat that `bypass_mode = "always"` waives every rule of that ruleset for the App. When in doubt, leave the flag off — the variable/secret footprint (steps 7–8) alone already closes the cascade gap for workflows that read `vars.PORTFOLIO_APP_ID`.
 
 ## See also
 

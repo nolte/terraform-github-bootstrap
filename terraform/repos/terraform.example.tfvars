@@ -4,11 +4,13 @@
 
 owner = "nolte"
 
-# Numeric ID of the portfolio GitHub App. Only needed when a ruleset below sets
-# `bypass_portfolio_app = true`. Never commit the real ID — put it in the
-# git-ignored `terraform.tfvars`, or export it per session:
-#   export TF_VAR_portfolio_app_id="$(gopass show -o internet/github.com/nolte/apps/nolte-portfolio-app/appid)"
-# portfolio_app_id = "<app-id>"
+# Numeric ID of the portfolio GitHub App (a non-secret identifier — the App's
+# private key is the secret and never leaves gopass). Only needed when a
+# ruleset below sets `bypass_portfolio_app = true`. Keep it out of committed
+# files: put it in the git-ignored `terraform.tfvars`, or export it per
+# session via the shared env loader (honours PORTFOLIO_APP_GOPASS_PATH):
+#   source scripts/portfolio-app-env.sh   # exports TF_VAR_portfolio_app_id
+# portfolio_app_id = 123456
 
 repositories = {
   # Dogfood: the bootstrap repo manages itself. Adopt existing state with
