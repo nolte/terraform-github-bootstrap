@@ -66,6 +66,18 @@ tasks:
       - terraform -chdir=terraform/portfolio-app init -input=false
       - terraform -chdir=terraform/portfolio-app apply
 
+  tf:plan:dockerhub:
+    desc: terraform plan for the dockerhub root module (needs `source scripts/dockerhub-env.sh` first)
+    cmds:
+      - terraform -chdir=terraform/dockerhub init -input=false
+      - terraform -chdir=terraform/dockerhub plan
+
+  tf:apply:dockerhub:
+    desc: terraform apply for the dockerhub root module (human-gated)
+    cmds:
+      - terraform -chdir=terraform/dockerhub init -input=false
+      - terraform -chdir=terraform/dockerhub apply
+
   tf:plan:portfolio-ops:
     desc: terraform plan for the portfolio-ops root module (needs `source scripts/portfolio-ops-env.sh` first)
     cmds:
