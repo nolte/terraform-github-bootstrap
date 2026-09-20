@@ -23,6 +23,52 @@ variable "portfolio_app_id" {
   default = null
 }
 
+variable "dockerhub_username" {
+  description = <<-EOT
+    Docker Hub account name the pull token belongs to, written to the
+    DOCKERHUB_USERNAME Actions variable of every repository that sets
+    `dockerhub_pull = true`.
+
+    Required only when at least one repository opts in — otherwise leave it
+    null. Not secret (it appears in every image reference the account
+    publishes), but it still belongs in the environment rather than in a
+    committed file, next to the token it pairs with:
+
+      source scripts/dockerhub-env.sh   # exports TF_VAR_dockerhub_username
+
+    Use the ACCOUNT NAME, never the e-mail address used to sign in — the
+    registry rejects the latter at login.
+  EOT
+
+  type    = string
+  default = null
+}
+
+variable "dockerhub_token" {
+  description = <<-EOT
+    Docker Hub personal access token matching `var.dockerhub_username`,
+    written to the DOCKERHUB_TOKEN Actions secret of every repository that
+    sets `dockerhub_pull = true`.
+
+    Required only when at least one repository opts in — otherwise leave it
+    null. Scope it `Public Repo Read-only`: nothing this credential serves
+    pushes an image, so anything wider only widens what a leaked token
+    reaches. Never the account password, which cannot be scoped down or
+    revoked on its own.
+
+      source scripts/dockerhub-env.sh   # exports TF_VAR_dockerhub_token
+
+    Note that `github_actions_secret` writes this value into Terraform state.
+    A local, git-ignored state is acceptable for a read-only token; this
+    concern has to be revisited before any move to a remote backend without
+    encryption at rest.
+  EOT
+
+  type      = string
+  default   = null
+  sensitive = true
+}
+
 variable "repositories" {
   description = <<-EOT
     Repositories managed by Terraform. Each entry produces a github_repository
@@ -52,6 +98,21 @@ variable "repositories" {
     # only sets it when explicitly given here, otherwise the field is left
     # to the existing repo state.
     default_branch = optional(string)
+
+    # Give this repository the Docker Hub read credential: a
+    # DOCKERHUB_USERNAME Actions variable and a DOCKERHUB_TOKEN Actions
+    # secret, so its CI pulls images authenticated instead of anonymously.
+    #
+    # Set it when the repository demonstrably pulls from Docker Hub — a
+    # `language: docker_image` pre-commit hook, a Docker Hub base image in a
+    # Dockerfile the pipeline builds, a compose stack in an E2E job — and not
+    # pre-emptively: every extra copy of a credential is an extra place it can
+    # leak from, and a repository without the pair keeps pulling anonymously,
+    # which is degraded rather than broken.
+    #
+    # The credential itself comes from `var.dockerhub_username` /
+    # `var.dockerhub_token`, never from here. See dockerhub.tf.
+    dockerhub_pull = optional(bool, false)
 
     # Per-repo ruleset. Set to null to opt out (e.g. for archived repos).
     ruleset = optional(object({

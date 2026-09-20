@@ -10,6 +10,7 @@ This repository owns:
 - **Per-repository rulesets** — modern branch-protection via `github_repository_ruleset`, including the bypass actor a repo's release automation needs when its ruleset protects the branch the portfolio App pushes to.
 - **Portfolio App footprint** — per-repo `PORTFOLIO_APP_ID` variable and `PORTFOLIO_APP_PRIVATE_KEY` secret on consumer repos (see [Portfolio App](portfolio-app.md)).
 - **Portfolio Ops wiring** — Actions variables and secrets for the `gh-portfolio-ops` automation repo, starting with the PR merge-queue board (see [Portfolio Ops](portfolio-ops.md)).
+- **Docker Hub pull credential** — a read-only `DOCKERHUB_USERNAME` variable and `DOCKERHUB_TOKEN` secret on repositories that set `dockerhub_pull = true`, so their CI stops pulling images on a rate-limited shared runner IP (see [Docker Hub Credential](dockerhub.md)).
 
 Per-repository configuration that Probot already handles well (labels, merge strategy, classic branch protection, release-drafter, boring-cyborg) stays in [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing) via the Probot Settings app.
 
