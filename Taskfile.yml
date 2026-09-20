@@ -43,13 +43,19 @@ tasks:
         done
 
   tf:plan:
-    desc: terraform plan for the repos root module (requires GITHUB_TOKEN with `repo` scope; plus TF_VAR_portfolio_app_id — `source scripts/portfolio-app-env.sh` — when a ruleset sets bypass_portfolio_app)
+    desc: >-
+      terraform plan for the repos root module (requires GITHUB_TOKEN with
+      `repo` scope; plus `source scripts/portfolio-app-env.sh` when a ruleset
+      sets bypass_portfolio_app, and `source scripts/dockerhub-env.sh` when a
+      repository sets dockerhub_pull)
     cmds:
       - terraform -chdir=terraform/repos init -input=false
       - terraform -chdir=terraform/repos plan
 
   tf:apply:
-    desc: terraform apply for the repos root module (human-gated; same env prerequisites as tf:plan)
+    desc: >-
+      terraform apply for the repos root module (human-gated; same env
+      prerequisites as tf:plan)
     cmds:
       - terraform -chdir=terraform/repos init -input=false
       - terraform -chdir=terraform/repos apply
@@ -65,18 +71,6 @@ tasks:
     cmds:
       - terraform -chdir=terraform/portfolio-app init -input=false
       - terraform -chdir=terraform/portfolio-app apply
-
-  tf:plan:dockerhub:
-    desc: terraform plan for the dockerhub root module (needs `source scripts/dockerhub-env.sh` first)
-    cmds:
-      - terraform -chdir=terraform/dockerhub init -input=false
-      - terraform -chdir=terraform/dockerhub plan
-
-  tf:apply:dockerhub:
-    desc: terraform apply for the dockerhub root module (human-gated)
-    cmds:
-      - terraform -chdir=terraform/dockerhub init -input=false
-      - terraform -chdir=terraform/dockerhub apply
 
   tf:plan:portfolio-ops:
     desc: terraform plan for the portfolio-ops root module (needs `source scripts/portfolio-ops-env.sh` first)

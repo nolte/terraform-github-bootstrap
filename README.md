@@ -41,10 +41,9 @@ State backend is currently **local** (`terraform.tfstate` next to the module). W
 ```
 terraform/
   repos/                # repository inventory + per-repo rulesets
+                        # + per-repo DOCKERHUB_USERNAME/_TOKEN (dockerhub.tf)
   portfolio-app/        # wrapper around gh-plumbing//terraform/portfolio-app
                         # provisions per-repo PORTFOLIO_APP_ID + PORTFOLIO_APP_PRIVATE_KEY
-  dockerhub/            # wrapper around gh-plumbing//terraform/dockerhub-pull
-                        # provisions per-repo DOCKERHUB_USERNAME + DOCKERHUB_TOKEN
 docs/                   # MkDocs source (English)
 .github/                # Probot configs + reusable-workflow consumers
 scripts/                # operator helpers (gopass → TF_VAR_* env loaders)

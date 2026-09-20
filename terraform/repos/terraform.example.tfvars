@@ -12,6 +12,14 @@ owner = "nolte"
 #   source scripts/portfolio-app-env.sh   # exports TF_VAR_portfolio_app_id
 # portfolio_app_id = 123456
 
+# Docker Hub read credential, handed to every repository below that sets
+# `dockerhub_pull = true`. Both come from the environment, never from this
+# file — the token in particular outlives the shell that needed it once it
+# lands on disk:
+#   source scripts/dockerhub-env.sh   # exports TF_VAR_dockerhub_username + _token
+# Scope the token `Public Repo Read-only`; nothing it serves pushes an image.
+# Leave both unset when no repository opts in — the concern is then inert.
+
 repositories = {
   # Dogfood: the bootstrap repo manages itself. Adopt existing state with
   #   terraform import github_repository.managed[\"terraform-github-bootstrap\"] terraform-github-bootstrap
@@ -75,6 +83,23 @@ repositories = {
       # bypass_portfolio_app = true
     }
   }
+
+  # kamerplanter — the repository this account's Docker Hub pulls actually
+  # come from: two `language: docker_image` pre-commit hooks (actionlint,
+  # shellcheck) plus `node`, `postgres`, `python`,
+  # `nginxinc/nginx-unprivileged` and `busybox` in its image builds and E2E
+  # stack, all pulled anonymously today (nolte/kamerplanter#1321).
+  #
+  # ADOPT IT FIRST. Measured with a real plan: without
+  #   terraform import github_repository.managed["kamerplanter"] kamerplanter
+  # Terraform reports `github_repository.managed["kamerplanter"] will be
+  # created` — the flag can only reach a repository this map already manages.
+  # kamerplanter = {
+  #   description    = "..."   # must match .github/settings.yml verbatim
+  #   visibility     = "public"
+  #   dockerhub_pull = true
+  #   ruleset        = null     # rulesets stay owned where they are today
+  # }
 
   # Add further repos one at a time. Adopt each existing repo via
   # `terraform import github_repository.managed["<name>"] <name>` before apply.
