@@ -43,7 +43,7 @@ tasks:
         done
 
   tf:plan:
-    desc: terraform plan for the repos root module (requires GITHUB_TOKEN with `repo` scope; plus TF_VAR_portfolio_app_id — `source scripts/portfolio-app-env.sh` — when a ruleset sets bypass_portfolio_app)
+    desc: terraform plan for the repos root module (requires GITHUB_TOKEN with `repo` scope; plus TF_VAR_portfolio_app_id — `source scripts/portfolio-app-env.sh` — when a ruleset sets bypass_portfolio_app; plus `source scripts/dockerhub-env.sh` when a repo sets dockerhub_pull_credentials)
     cmds:
       - terraform -chdir=terraform/repos init -input=false
       - terraform -chdir=terraform/repos plan
