@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Source this file before `task tf:plan:dockerhub` / `tf:apply:dockerhub`.
+# Source this file before `task tf:plan` / `task tf:apply`.
 #
 # Usage:
 #   source scripts/dockerhub-env.sh
-#   task tf:plan:dockerhub
+#   task tf:plan
 #
 # Docker Hub credentials come from ONE of two sources, per value:
 #   1. the environment: DOCKERHUB_USERNAME / DOCKERHUB_TOKEN (wins if set)
