@@ -48,6 +48,10 @@ variable "repositories" {
     has_wiki     = optional(bool, false)
     auto_init    = optional(bool, false)
 
+    # Provision DOCKERHUB_USERNAME (variable) + DOCKERHUB_TOKEN (secret) so CI
+    # pulls from Docker Hub authenticated. Needs var.dockerhub_username/token.
+    dockerhub_pull_credentials = optional(bool, false)
+
     # Default branch — the Probot Settings App also writes this; Terraform
     # only sets it when explicitly given here, otherwise the field is left
     # to the existing repo state.
@@ -85,4 +89,17 @@ variable "repositories" {
   }))
 
   default = {}
+}
+
+variable "dockerhub_username" {
+  description = "Docker Hub account name for repos with `dockerhub_pull_credentials = true`. Required only then. Set via `source scripts/dockerhub-env.sh` (TF_VAR_dockerhub_username from env DOCKERHUB_USERNAME or gopass)."
+  type        = string
+  default     = null
+}
+
+variable "dockerhub_token" {
+  description = "Docker Hub access token for repos with `dockerhub_pull_credentials = true`. Required only then. Set via `source scripts/dockerhub-env.sh` (TF_VAR_dockerhub_token from env DOCKERHUB_TOKEN or gopass). Marked sensitive."
+  type        = string
+  default     = null
+  sensitive   = true
 }

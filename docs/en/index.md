@@ -10,6 +10,7 @@ This repository owns:
 - **Per-repository rulesets** — modern branch-protection via `github_repository_ruleset`, including the bypass actor a repo's release automation needs when its ruleset protects the branch the portfolio App pushes to.
 - **Portfolio App footprint** — per-repo `PORTFOLIO_APP_ID` variable and `PORTFOLIO_APP_PRIVATE_KEY` secret on consumer repos (see [Portfolio App](portfolio-app.md)).
 - **Portfolio Ops wiring** — Actions variables and secrets for the `gh-portfolio-ops` automation repo, starting with the PR merge-queue board (see [Portfolio Ops](portfolio-ops.md)).
+- **Docker Hub pull credentials** — `dockerhub_pull_credentials = true` on a repo in `terraform/repos` adds the `DOCKERHUB_USERNAME` variable and `DOCKERHUB_TOKEN` secret in the same apply, avoiding anonymous rate limits in CI. Mint the access token in Docker Hub (UI-only, "Public Repo Read-only" suffices), then `source scripts/dockerhub-env.sh` (values from env `DOCKERHUB_USERNAME`/`DOCKERHUB_TOKEN` or gopass (token: `internet/hub.docker.com/token/github-read-only`, username: `internet/hub.docker.com/username`)) before `task tf:plan` / `task tf:apply`.
 
 Per-repository configuration that Probot already handles well (labels, merge strategy, classic branch protection, release-drafter, boring-cyborg) stays in [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing) via the Probot Settings app.
 
