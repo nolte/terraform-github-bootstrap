@@ -42,6 +42,9 @@ resource "github_repository" "managed" {
       # `.github/settings.yml` (Probot) is the leading system for these.
       homepage_url,
       topics,
+      # pages.tf (github_repository_pages) owns GitHub Pages; the deprecated
+      # in-resource `pages` block must never compete with it.
+      pages,
     ]
   }
 }

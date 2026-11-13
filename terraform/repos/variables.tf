@@ -52,6 +52,21 @@ variable "repositories" {
     # pulls from Docker Hub authenticated. Needs var.dockerhub_username/token.
     dockerhub_pull_credentials = optional(bool, false)
 
+    # GitHub Pages — optional, off unless `enabled = true`. See pages.tf.
+    #   build_type = "workflow": Pages served by a GitHub Actions deploy
+    #                (actions/deploy-pages); no branch involved.
+    #   build_type = "legacy":   "Deploy from a branch" — `branch` + `path`.
+    #                Only applied once `branch` exists in the repo; until then
+    #                the plan shows a `pages_branch_exists` check warning.
+    # Turning `enabled` off (or removing the block) DISABLES Pages on GitHub.
+    pages = optional(object({
+      enabled    = optional(bool, false)
+      build_type = optional(string, "workflow") # workflow | legacy
+      branch     = optional(string, "gh-pages")
+      path       = optional(string, "/") # / | /docs
+      cname      = optional(string)
+    }))
+
     # Default branch — the Probot Settings App also writes this; Terraform
     # only sets it when explicitly given here, otherwise the field is left
     # to the existing repo state.
@@ -89,6 +104,17 @@ variable "repositories" {
   }))
 
   default = {}
+
+  validation {
+    condition = alltrue([
+      for name, repo in var.repositories :
+      repo.pages == null ? true : (
+        contains(["workflow", "legacy"], repo.pages.build_type) &&
+        contains(["/", "/docs"], repo.pages.path)
+      )
+    ])
+    error_message = "pages.build_type must be \"workflow\" or \"legacy\", pages.path must be \"/\" or \"/docs\"."
+  }
 }
 
 variable "dockerhub_username" {
