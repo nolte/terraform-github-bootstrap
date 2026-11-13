@@ -115,6 +115,14 @@ variable "repositories" {
     ])
     error_message = "pages.build_type must be \"workflow\" or \"legacy\", pages.path must be \"/\" or \"/docs\"."
   }
+
+  validation {
+    condition = alltrue([
+      for name, repo in var.repositories :
+      !(try(repo.pages.enabled, false) && repo.archived)
+    ])
+    error_message = "pages.enabled = true is not possible on an archived repository (read-only)."
+  }
 }
 
 variable "dockerhub_username" {
