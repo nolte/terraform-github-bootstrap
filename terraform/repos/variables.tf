@@ -52,6 +52,12 @@ variable "repositories" {
     # pulls from Docker Hub authenticated. Needs var.dockerhub_username/token.
     dockerhub_pull_credentials = optional(bool, false)
 
+    # Provision SYSTEM_IMAGE_SIGNING_KEY + SYSTEM_IMAGE_SIGNING_PASSPHRASE
+    # (secrets) and SYSTEM_IMAGE_SIGNING_PUBLIC_KEY (variable) so CI signs
+    # bootable system images with the shared Sigstore key. See
+    # system-image-signing.tf. Needs var.system_image_signing_{key,passphrase,public_key}.
+    system_image_signing = optional(bool, false)
+
     # GitHub Pages — optional, off unless `enabled = true`. See pages.tf.
     #   build_type = "workflow": Pages served by a GitHub Actions deploy
     #                (actions/deploy-pages); no branch involved.
@@ -136,4 +142,24 @@ variable "dockerhub_token" {
   type        = string
   default     = null
   sensitive   = true
+}
+
+variable "system_image_signing_key" {
+  description = "Encrypted Sigstore/cosign private key (PEM: `ENCRYPTED SIGSTORE PRIVATE KEY` from `skopeo generate-sigstore-key`, or `ENCRYPTED COSIGN PRIVATE KEY` from `cosign generate-key-pair`) for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_key from env SYSTEM_IMAGE_SIGNING_KEY or gopass). Marked sensitive."
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "system_image_signing_passphrase" {
+  description = "Passphrase of the encrypted Sigstore/cosign private key for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_passphrase from env SYSTEM_IMAGE_SIGNING_PASSPHRASE or gopass). Marked sensitive."
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "system_image_signing_public_key" {
+  description = "Sigstore public key (PEM) matching var.system_image_signing_key, for repos with `system_image_signing = true`. Required only then; not a secret. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_public_key from env SYSTEM_IMAGE_SIGNING_PUBLIC_KEY or gopass)."
+  type        = string
+  default     = null
 }

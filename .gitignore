@@ -33,3 +33,8 @@ site/
 
 # Task local state
 .task/
+
+# Signing key material (never commit)
+system-image.private
+system-image.pub
+*.private
