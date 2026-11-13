@@ -145,14 +145,14 @@ variable "dockerhub_token" {
 }
 
 variable "system_image_signing_key" {
-  description = "Encrypted Sigstore private key (PEM, `ENCRYPTED SIGSTORE PRIVATE KEY`) for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_key from env SYSTEM_IMAGE_SIGNING_KEY or gopass). Marked sensitive."
+  description = "Encrypted Sigstore/cosign private key (PEM: `ENCRYPTED SIGSTORE PRIVATE KEY` from `skopeo generate-sigstore-key`, or `ENCRYPTED COSIGN PRIVATE KEY` from `cosign generate-key-pair`) for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_key from env SYSTEM_IMAGE_SIGNING_KEY or gopass). Marked sensitive."
   type        = string
   default     = null
   sensitive   = true
 }
 
 variable "system_image_signing_passphrase" {
-  description = "Passphrase of the encrypted Sigstore private key for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_passphrase from env SYSTEM_IMAGE_SIGNING_PASSPHRASE or gopass). Marked sensitive."
+  description = "Passphrase of the encrypted Sigstore/cosign private key for repos with `system_image_signing = true`. Required only then. Set via `source scripts/system-image-signing-env.sh` (TF_VAR_system_image_signing_passphrase from env SYSTEM_IMAGE_SIGNING_PASSPHRASE or gopass). Marked sensitive."
   type        = string
   default     = null
   sensitive   = true

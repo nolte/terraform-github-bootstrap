@@ -32,7 +32,7 @@ appliance. The key-based signature only serves the appliance's update policy.
 
 | Step | Where | Owner |
 |---|---|---|
-| 1. Create the key pair | local shell (`skopeo generate-sigstore-key`) | **manual (you), one-time** |
+| 1. Create the key pair | local shell (`skopeo generate-sigstore-key` or `cosign generate-key-pair`) | **manual (you), one-time** |
 | 2. Store private key, passphrase, public key in gopass | local shell | **manual (you), one-time** |
 | 3. Publish the public key in `nolte/gh-plumbing` (`keys/system-image.pub`) and cut a gh-plumbing release | `nolte/gh-plumbing`, separate pull request there | **manual (you)** |
 | 4. Opt the repository in | `terraform/repos/terraform.tfvars` | **manual (you)** |
@@ -44,7 +44,7 @@ Terraform can't produce this key format, so steps 1–3 stay outside it.
 
 | Name | Kind | Content |
 |---|---|---|
-| `SYSTEM_IMAGE_SIGNING_KEY` | Actions secret | Encrypted Sigstore private key (PEM, `ENCRYPTED SIGSTORE PRIVATE KEY`) |
+| `SYSTEM_IMAGE_SIGNING_KEY` | Actions secret | Encrypted Sigstore/cosign private key (PEM: `ENCRYPTED SIGSTORE PRIVATE KEY` from `skopeo generate-sigstore-key`, or `ENCRYPTED COSIGN PRIVATE KEY` from `cosign generate-key-pair`) |
 | `SYSTEM_IMAGE_SIGNING_PASSPHRASE` | Actions secret | Passphrase of that private key |
 | `SYSTEM_IMAGE_SIGNING_PUBLIC_KEY` | Actions variable | Matching public key (PEM), so a workflow can check that the secret matches the key published in `nolte/gh-plumbing` |
 
@@ -53,39 +53,57 @@ fails with a precondition that names `scripts/system-image-signing-env.sh`.
 
 ## One-time key creation
 
-Create the key pair once, outside Terraform. The passphrase lives only in
-gopass and in a short-lived file that `skopeo` reads.
+Create the key pair once, outside Terraform. The whole procedure runs in a
+subshell inside a fresh temporary directory, so key files never land in a git
+checkout and the restrictive `umask` doesn't leak into your shell. The
+passphrase lives only in gopass and in a short-lived file that `skopeo` reads.
+
+The snippet writes to `SYSTEM_IMAGE_SIGNING_GOPASS_PREFIX` if set, otherwise
+to the default prefix. `gopass insert` asks before it overwrites an existing
+entry.
 
 ```sh
-GP=internet/github.com/nolte/signing/system-image
+(
+  GP="${SYSTEM_IMAGE_SIGNING_GOPASS_PREFIX:-internet/github.com/nolte/signing/system-image}"
+  umask 077
+  WORKDIR=$(mktemp -d)
+  cd "$WORKDIR" || exit 1
 
-# 1. Generate a single-line passphrase and store it in gopass.
-openssl rand -base64 32 | gopass insert -f "$GP/passphrase"
+  # 1. Generate a single-line passphrase and store it in gopass.
+  openssl rand -base64 32 | gopass insert "$GP/passphrase"
 
-# 2. Write it to a private, short-lived passphrase file.
-umask 077
-PASSFILE=$(mktemp)
-gopass show -o "$GP/passphrase" > "$PASSFILE"
+  # 2. Write it to a private, short-lived passphrase file.
+  gopass show -o "$GP/passphrase" > passphrase
 
-# 3. Create the key pair: system-image.private and system-image.pub.
-skopeo generate-sigstore-key --output-prefix system-image --passphrase-file "$PASSFILE"
+  # 3. Create the key pair: system-image.private and system-image.pub.
+  skopeo generate-sigstore-key --output-prefix system-image --passphrase-file passphrase
 
-# 4. Store both PEM files in gopass (multi-line).
-gopass insert -m "$GP/private_key" < system-image.private
-gopass insert -m "$GP/public_key"  < system-image.pub
+  # 4. Store both PEM files in gopass (multi-line).
+  gopass insert -m "$GP/private_key" < system-image.private
+  gopass insert -m "$GP/public_key"  < system-image.pub
 
-# 5. Wipe the passphrase file and the private key file.
-shred -u "$PASSFILE" system-image.private
+  # 5. Copy the public key out BEFORE the cleanup (see below), e.g.:
+  #    cp system-image.pub ~/path/to/gh-plumbing/keys/system-image.pub
+
+  # 6. Wipe the private key and the passphrase file, then the work dir.
+  shred -u system-image.private passphrase
+  cd / && rm -rf "$WORKDIR"
+)
 ```
+
+`cosign generate-key-pair` is an alternative to step 3. It writes
+`cosign.key` (PEM `ENCRYPTED COSIGN PRIVATE KEY`) and `cosign.pub` and reads
+the passphrase from `COSIGN_PASSWORD`; rename both files to
+`system-image.private` and `system-image.pub` before step 4. Before relying on
+a cosign-format key, sign once with the consumer's signing step (for example
+`skopeo copy --sign-by-sigstore-private-key …`) to confirm it accepts the key.
 
 Step 3 of the table publishes `system-image.pub` in `nolte/gh-plumbing`.
-Copy it into a gh-plumbing checkout as `keys/system-image.pub`, open a pull
-request there, and cut a gh-plumbing release once it's merged. Then delete
-the local copy too:
-
-```sh
-rm system-image.pub
-```
+Copy it into a gh-plumbing checkout as `keys/system-image.pub` (step 5 of the
+snippet) **before** the work directory is removed, open a pull request there,
+and cut a gh-plumbing release once it's merged. The `.gitignore` of this
+repository ignores `system-image.private`, `system-image.pub`, and `*.private`
+as a safety net.
 
 Consumer repositories don't carry a copy of the public key; see
 [Public key distribution](#public-key-distribution).
@@ -106,10 +124,13 @@ The canonical public key lives in `nolte/gh-plumbing` at
 | Builds (pinned) | `https://raw.githubusercontent.com/nolte/gh-plumbing/<tag>/keys/system-image.pub` |
 | Human reference (after the next gh-plumbing release) | `https://nolte.github.io/gh-plumbing/keys/system-image.pub` |
 
-SHA-256 fingerprint of the current key file:
+The authoritative SHA-256 fingerprint of the current key file is documented
+in gh-plumbing at `docs/en/signing/system-image-key.md`, published as
+[System image signing key](https://nolte.github.io/gh-plumbing/signing/system-image-key/).
+Compute it for a local or downloaded copy with:
 
-```text
-35eab2c5b1a413e82ebd8919f2158e68af7c165da4535533ebf15a9f9a8bd084
+```sh
+curl -fsSL https://raw.githubusercontent.com/nolte/gh-plumbing/<tag>/keys/system-image.pub | sha256sum
 ```
 
 Consumer builds fetch the key at build time and bake it into the image. Every
@@ -144,6 +165,14 @@ task tf:plan     # review: 2 secrets + 1 variable per opted-in repo
 task tf:apply    # human-gated apply
 ```
 
+The loader exports the key material into your shell, where it stays until the
+shell ends. Unset it once plan and apply are done:
+
+```sh
+unset TF_VAR_system_image_signing_key TF_VAR_system_image_signing_passphrase \
+  TF_VAR_system_image_signing_public_key
+```
+
 Once any repository opts in, **every** `task tf:plan` for `terraform/repos`
 needs the loader sourced first; otherwise the precondition fails. Source the
 other loaders too when their features are in use (for example
@@ -160,14 +189,17 @@ gh secret list   -R nolte/<repo>    # SYSTEM_IMAGE_SIGNING_KEY, SYSTEM_IMAGE_SIG
 gh variable list -R nolte/<repo>    # SYSTEM_IMAGE_SIGNING_PUBLIC_KEY
 ```
 
-Compare the variable against the public key published in `nolte/gh-plumbing`:
+Compare the variable against the public key published in `nolte/gh-plumbing`
+at the release tag the consumers pin (`<tag>`):
 
 ```sh
 diff <(gh variable get SYSTEM_IMAGE_SIGNING_PUBLIC_KEY -R nolte/<repo>) \
-  <(curl -fsSL https://raw.githubusercontent.com/nolte/gh-plumbing/develop/keys/system-image.pub)
+  <(curl -fsSL https://raw.githubusercontent.com/nolte/gh-plumbing/<tag>/keys/system-image.pub)
 ```
 
-No output means the Actions variable matches the published key.
+No output means the Actions variable matches the published key. This holds
+only outside a rotation window: between rotation steps 2 and 4 the pinned tag
+already carries the new key while the variable still holds the old one.
 
 ## First consumer
 
@@ -197,11 +229,15 @@ therefore has to reach them in a release that is **still signed with the old
 key**. Rotate in this order:
 
 1. **Create a new key pair** as in [One-time key creation](#one-time-key-creation),
-   but keep it under a separate gopass prefix for now, so the current entries
-   stay intact.
+   but under a separate gopass prefix, so the current entries stay intact.
+   Set it explicitly before running the snippet:
+   `export SYSTEM_IMAGE_SIGNING_GOPASS_PREFIX=<new prefix>`. Unset it again
+   afterwards, so the loader keeps reading the current key until step 4.
 2. **Ship the new public key with the old key.** Publish the new public key
-   in a new gh-plumbing release (`keys/system-image.pub`, with its new
-   SHA-256). Each consumer then bumps its pinned gh-plumbing tag and expected
+   in a new gh-plumbing release (`keys/system-image.pub`); its new SHA-256
+   fingerprint is published in gh-plumbing's
+   [System image signing key](https://nolte.github.io/gh-plumbing/signing/system-image-key/)
+   page with that release. Each consumer then bumps its pinned gh-plumbing tag and expected
    fingerprint and ships a release that bundles the **new** public key but is
    still signed with the **old** key. Appliances accept that release and pick
    up the new key.

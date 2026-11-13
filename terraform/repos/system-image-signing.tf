@@ -4,13 +4,14 @@
 # containers-policy.json `sigstoreSigned` requirement cannot verify keyless
 # (Fulcio/GitHub-workflow identity) signatures yet, so CI signs with one shared
 # key pair instead. Repos opting in via `system_image_signing = true` get
-#   - SYSTEM_IMAGE_SIGNING_KEY        (Actions secret)   — encrypted private key PEM
+#   - SYSTEM_IMAGE_SIGNING_KEY        (Actions secret)   — encrypted Sigstore/cosign private key PEM
 #   - SYSTEM_IMAGE_SIGNING_PASSPHRASE (Actions secret)   — passphrase of that key
 #   - SYSTEM_IMAGE_SIGNING_PUBLIC_KEY (Actions variable) — public key PEM, not a secret
 # in the same apply that configures the repository.
 #
-# The key pair is created once, outside Terraform, with
-# `skopeo generate-sigstore-key` and stored in gopass. Load it with
+# The key pair is created once, outside Terraform, and stored in gopass. PEM:
+# `ENCRYPTED SIGSTORE PRIVATE KEY` from `skopeo generate-sigstore-key`, or
+# `ENCRYPTED COSIGN PRIVATE KEY` from `cosign generate-key-pair`. Load it with
 # `source scripts/system-image-signing-env.sh`. The values land in the
 # Terraform state (like DOCKERHUB_TOKEN) — treat the state file as sensitive.
 # Key creation and the rotation runbook: docs/en/system-image-signing.md.
