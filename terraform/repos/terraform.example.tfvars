@@ -76,6 +76,18 @@ repositories = {
     }
   }
 
+  # GitHub Pages — opt-in per repo via the `pages` feature toggle (pages.tf).
+  # Omit the block or keep `enabled = false` and Terraform leaves Pages alone.
+  # some-docs-repo = {
+  #   pages = {
+  #     enabled    = true
+  #     build_type = "workflow"   # Pages source "GitHub Actions" (default)
+  #     # build_type = "legacy"   # "Deploy from a branch" — applied only once
+  #     # branch     = "gh-pages" # the branch exists; until then the plan
+  #     # path       = "/"        # warns via the pages_branch_exists check
+  #   }
+  # }
+
   # Add further repos one at a time. Adopt each existing repo via
   # `terraform import github_repository.managed["<name>"] <name>` before apply.
 }
