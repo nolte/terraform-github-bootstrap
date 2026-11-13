@@ -20,7 +20,8 @@
 #   gopass insert -m internet/github.com/nolte/signing/system-image/private_key < system-image.private
 #   gopass insert -m internet/github.com/nolte/signing/system-image/public_key  < system-image.pub
 #   gopass insert -m internet/github.com/nolte/signing/system-image/passphrase  < <file>
-# Then delete the local key files. Rotation runbook: docs/en/system-image-signing.md.
+# Publish system-image.pub in nolte/gh-plumbing (keys/system-image.pub), then
+# delete the local key files. Runbook incl. rotation: docs/en/system-image-signing.md.
 #
 # Meant to be *sourced*: no `set -e`, failures use `return 1 || exit 1`.
 
