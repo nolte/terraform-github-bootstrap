@@ -16,6 +16,23 @@ tasks:
     cmds:
       - pre-commit run --all-files
 
+  vale:sync:
+    desc: Fetch the Vale style packages pinned in .vale.ini
+    sources:
+      - .vale.ini
+    status:
+      - test -d .github/styles/Microsoft
+      - test -d .github/styles/RedHat
+      - test -d .github/styles/config/vocabularies/technical
+    cmds:
+      - vale sync
+
+  lint:prose:
+    desc: Vale at error level over the English prose (README.md, docs/en/); pass files after `--` to narrow the scope
+    deps: [vale:sync]
+    cmds:
+      - vale --minAlertLevel=error {{.CLI_ARGS | default "README.md docs/en"}}
+
   test:
     desc: terraform validate across every root module
     cmds:

@@ -31,6 +31,20 @@ jobs:
           cache-dependency-path: docs/requirements.txt
       - run: pip install -r docs/requirements.txt
       - run: pip install pre-commit
+      # Vale for the `vale` pre-commit hook (task lint:prose). The version comes
+      # from `.tool-versions`, so local and CI can't drift apart; the archive is
+      # verified against the release's own checksum list before install.
+      - name: Install Vale
+        run: |
+          set -euo pipefail
+          VALE_VERSION=$(awk '$1 == "vale" {print $2}' .tool-versions)
+          base="https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}"
+          asset="vale_${VALE_VERSION}_Linux_64-bit.tar.gz"
+          cd "$RUNNER_TEMP"
+          curl -fsSLO "${base}/${asset}"
+          curl -fsSL "${base}/vale_${VALE_VERSION}_checksums.txt" | grep " ${asset}\$" | sha256sum -c -
+          sudo tar -xzf "$asset" -C /usr/local/bin vale
+          vale --version
       - run: task lint
       - run: task test
       - run: task docs

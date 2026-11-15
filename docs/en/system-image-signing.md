@@ -5,7 +5,7 @@ module. A repository receives the shared Sigstore signing key only when its
 entry in `terraform.tfvars` sets `system_image_signing = true`; every other
 repository is left untouched.
 
-Every repository that publishes a bootable system image signs it with the
+Every repository that publishes a bootc system image signs it with the
 **same** key. The key is created once by the operator, stored in gopass, and
 distributed from here. Terraform never creates the key and never reads it
 from a file in this repository.
@@ -54,7 +54,7 @@ fails with a precondition that names `scripts/system-image-signing-env.sh`.
 ## One-time key creation
 
 Create the key pair once, outside Terraform. The whole procedure runs in a
-subshell inside a fresh temporary directory, so key files never land in a git
+child shell inside a fresh temporary directory, so key files never land in a git
 checkout and the restrictive `umask` doesn't leak into your shell. The
 passphrase lives only in gopass and in a short-lived file that `skopeo` reads.
 
@@ -225,7 +225,7 @@ git-ignored, never copy it into a shared location, and wipe stale copies.
 ## Rotation
 
 Appliances accept only updates signed with the key they carry. A new public key
-therefore has to reach them in a release that is **still signed with the old
+therefore has to reach them in a release that's **still signed with the old
 key**. Rotate in this order:
 
 1. **Create a new key pair** as in [One-time key creation](#one-time-key-creation),

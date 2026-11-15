@@ -26,7 +26,8 @@ All developer commands go through `Taskfile.yml`:
 
 | Task | What it does |
 |---|---|
-| `task lint` | pre-commit (terraform_fmt, terraform_validate, tflint, yamllint) |
+| `task lint` | pre-commit (terraform_fmt, terraform_validate, tflint, yamllint, vale) |
+| `task lint:prose` | Vale at `error` level over `README.md` and `docs/en/` (`vale sync` runs first via `task vale:sync`); `task lint:prose -- <files>` narrows the scope; the pre-commit hook always runs the full scope |
 | `task test` | `terraform validate` across every root module |
 | `task docs` | `mkdocs build --strict` |
 | `task tf:fmt` | `terraform fmt -recursive terraform/` |
@@ -40,6 +41,7 @@ All developer commands go through `Taskfile.yml`:
 
 ## Working conventions
 
+- Prose follows `spec/project/prose-style/`: `.vale.ini` syncs Microsoft, RedHat and a pinned `nolte/vale-style` release, applies the Microsoft style (RedHat's spelling rule fails to load on Vale 3.15.2) and the shared `technical` vocabulary. A term Vale rejects goes upstream to `nolte/vale-style`; the repo-local vocabulary at `.github/styles/config/vocabularies/terraform-github-bootstrap/accept.txt` only bridges a pending upstream PR, and `vocab-drift-audit` reports entries that can be dropped once the pin is bumped.
 - **Never** run `terraform apply` from CI on this repo. Apply is a deliberate, human-gated step performed locally by the account owner.
 - **Never** commit a real `terraform.tfvars` containing secrets. Use `*.example.tfvars` for fixtures.
 - **Never** edit repository inventory or rulesets through the GitHub UI once Terraform manages them — any UI change is drift that must be reconciled back into Terraform.
