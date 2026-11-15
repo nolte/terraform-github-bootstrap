@@ -32,4 +32,8 @@ repos:
         name: vale (task lint:prose)
         entry: task lint:prose --
         language: system
+        # One invocation only: pre-commit otherwise splits the files across
+        # parallel runs, and their concurrent `vale sync` delete each other's
+        # package directories on a fresh checkout.
+        require_serial: true
         files: ^(README\.md|docs/en/.*\.md)$
