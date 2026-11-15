@@ -1,0 +1,24 @@
+# Repository-local Vale vocabulary. Tracked in git; `.gitignore` un-ignores this
+# one subtree of `.github/styles/`, which `vale sync` otherwise owns.
+#
+# Add a term here only while its upstream pull request against nolte/vale-style
+# is pending. A term useful beyond this repository belongs upstream -- the
+# `vocab-drift-audit` skill reports entries that have since been accepted there
+# and can be dropped.
+#
+# Pending upstream (nolte/vale-style), drop once released and the pin is bumped:
+#
+# gopass: the password store every loader script in scripts/ reads from.
+gopass
+# tfvars: Terraform's variable-definitions file type (`terraform.tfvars`).
+tfvars
+# ruleset: GitHub's product term for a branch or tag rule set. The `s?` covers
+# the plural, because a vocabulary entry is a whole-word pattern.
+[Rr]ulesets?
+# Sigstore / keyless / Fulcio: the signing project, its short-lived-identity
+# signing mode, and its certificate authority (docs/en/system-image-signing.md).
+Sigstore
+[Kk]eyless
+Fulcio
+# bootc: the bootable-container tooling whose policy.json limits keyless use.
+bootc

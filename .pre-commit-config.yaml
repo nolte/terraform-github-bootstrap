@@ -25,3 +25,11 @@ repos:
     hooks:
       - id: yamllint
         args: [-c=.yamllint.yml]
+
+  - repo: local
+    hooks:
+      - id: vale
+        name: vale (task lint:prose)
+        entry: task lint:prose --
+        language: system
+        files: ^(README\.md|docs/en/.*\.md)$

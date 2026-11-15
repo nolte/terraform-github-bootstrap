@@ -10,16 +10,16 @@ This repository owns parts of the [`nolte`](https://github.com/nolte) GitHub con
 
 > **`nolte` is a personal user account on GitHub, not an organisation.** Organisation-only concerns (org settings, teams, organisation-wide rulesets) are therefore out of scope here. If `nolte` is migrated to an organisation later, those concerns can be added in a separate root module without disturbing the current code.
 
-It is a deliberate complement to [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing):
+It's a deliberate complement to [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing):
 
 | Concern | Source of truth |
 |---|---|
-| Repository **inventory** (which repos exist, description, topics, visibility, has_issues / has_wiki / …) | **this repo** (Terraform `github_repository`) |
+| Repository **inventory** (which repos exist, description, topics, visibility, `has_issues` / `has_wiki` / …) | **this repo** (Terraform `github_repository`) |
 | Per-repo **repository rulesets** (modern branch protection) | **this repo** (Terraform `github_repository_ruleset`) |
 | Per-repo settings, labels, merge strategy, classic branch protection | [`gh-plumbing`](https://github.com/nolte/gh-plumbing) (Probot Settings App via `_extends`) |
 | Reusable workflows, Boring-Cyborg / Stale / Release-Drafter commons, Renovate preset | [`gh-plumbing`](https://github.com/nolte/gh-plumbing) |
 
-To keep both systems from fighting, the `github_repository` resource here `ignore_changes` on every field Probot owns (merge strategies, `delete_branch_on_merge`, auto-merge).
+To keep both systems from fighting, the `github_repository` resource here `ignore_changes` on every field Probot owns (merge strategies, `delete_branch_on_merge`, automerge).
 
 ## Getting started
 
@@ -32,7 +32,7 @@ task tf:plan            # plan against the live account (requires GITHUB_TOKEN w
 task tf:apply           # apply (human-gated)
 ```
 
-`terraform.tfvars` lives next to the root module and is git-ignored — copy `terraform.example.tfvars` and adjust. **Adopt every existing repo via `terraform import github_repository.managed["<name>"] <name>` before the first apply**, otherwise Terraform will try to create a duplicate.
+`terraform.tfvars` lives next to the root module and is git-ignored—copy `terraform.example.tfvars` and adjust. **Adopt every existing repo via `terraform import github_repository.managed["<name>"] <name>` before the first apply**, otherwise Terraform will try to create a duplicate.
 
 State backend is currently **local** (`terraform.tfstate` next to the module). When a remote backend is adopted, update the module and migrate state explicitly.
 
@@ -50,7 +50,7 @@ scripts/                # operator helpers (gopass → TF_VAR_* env loaders)
 
 ### portfolio-app credentials
 
-The portfolio-app module needs a GitHub App that is **registered manually** — there is no GitHub API for App creation or private-key generation. Five manual steps before the first `task tf:apply:portfolio-app`:
+The portfolio-app module needs a GitHub App that's **registered manually**: there is no GitHub API for App creation or private-key generation. Five manual steps before the first `task tf:apply:portfolio-app`:
 
 1. **Register the App** at <https://github.com/settings/apps/new>. Permissions and webhook settings are documented at [`docs/en/portfolio-app.md`](docs/en/portfolio-app.md) and in the [upstream setup guide](https://github.com/nolte/gh-plumbing/blob/develop/docs/en/portfolio-app/setup.md).
 2. **Generate a private key** (`.pem`) on the App's settings page.
@@ -72,12 +72,12 @@ task tf:plan:portfolio-app
 
 `scripts/portfolio-app-env.sh` exports `TF_VAR_app_id`, `TF_VAR_app_private_key`, and `GITHUB_TOKEN`; nothing touches tfvars or the repo. Full operator runbook at [`docs/en/portfolio-app.md`](docs/en/portfolio-app.md).
 
-> **Spec note.** `spec/project/project-structure/` does not currently list `terraform/` as a sanctioned top-level source tree (only `src/`, `custom_components/`, `.claude-plugin/`, `playbooks/`+`roles/`). This repository uses `terraform/` as a conscious extension — analogous to the Ansible exception. Tracked under `spec/source-layout-extension.md` once the spec amendment lands upstream.
+> **Spec note.** `spec/project/project-structure/` doesn't currently list `terraform/` as a sanctioned top-level source tree (only `src/`, `custom_components/`, `.claude-plugin/`, `playbooks/`+`roles/`). This repository uses `terraform/` as a conscious extension—analogous to the Ansible exception. Tracked under `spec/source-layout-extension.md` once the spec amendment lands upstream.
 
 ## Related repositories
 
-- [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing) — per-repo Probot Settings, reusable workflows, Renovate preset.
-- [`nolte/claude-shared`](https://github.com/nolte/claude-shared) — Claude Code plugin used to scaffold this repository.
+- [`nolte/gh-plumbing`](https://github.com/nolte/gh-plumbing)—per-repo Probot Settings, reusable workflows, Renovate preset.
+- [`nolte/claude-shared`](https://github.com/nolte/claude-shared)—Claude Code plugin used to scaffold this repository.
 
 ## Status
 
