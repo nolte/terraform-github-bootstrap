@@ -30,10 +30,9 @@ repos:
     hooks:
       - id: vale
         name: vale (task lint:prose)
-        entry: task lint:prose --
+        entry: task lint:prose
         language: system
-        # One invocation only: pre-commit otherwise splits the files across
-        # parallel runs, and their concurrent `vale sync` delete each other's
-        # package directories on a fresh checkout.
-        require_serial: true
-        files: ^(README\.md|docs/en/.*\.md)$
+        # Always the full prose scope in a single run: a vocabulary or pin change
+        # can break unchanged docs, and split parallel runs raced on `vale sync`.
+        pass_filenames: false
+        files: ^(README\.md|docs/en/.*\.md|\.vale\.ini|\.github/styles/config/vocabularies/.*)$

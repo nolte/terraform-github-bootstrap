@@ -41,7 +41,9 @@ system-image.pub
 
 # Vale: `vale sync` writes the downloaded style packages into .github/styles/,
 # so the directory stays ignored -- except this repository's own vocabulary,
-# which is source and has to be tracked.
+# which is source and has to be tracked. `.keep` is load-bearing: with only
+# `config/` present, `vale sync` writes the packages to `.vale-config/styles/`
+# instead, and `Vocab = technical` no longer resolves.
 .github/styles/*
 !.github/styles/.keep
 !.github/styles/config

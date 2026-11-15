@@ -1,19 +1,19 @@
 # Portfolio Ops—operator setup
 
-The `terraform/portfolio-ops/` root module wires the Actions variables and secrets for [`nolte/gh-portfolio-ops`](https://github.com/nolte/gh-portfolio-ops), the repository that hosts scheduled and manually dispatched workflows over the `nolte` portfolio (sibling to `gh-plumbing`). This page tells an operator (you) what to do *before* `task tf:apply:portfolio-ops` and what the apply will actually do.
+The `terraform/portfolio-ops/` root module wires the Actions variables and secrets for [`nolte/gh-portfolio-ops`](https://github.com/nolte/gh-portfolio-ops), the repository that hosts scheduled and dispatch-triggered workflows over the `nolte` portfolio (sibling to `gh-plumbing`). This page tells an operator (you) what to do *before* `task tf:apply:portfolio-ops` and what the apply will actually do.
 
 One `<concern>.tf` file exists per automation. The first concern is the **PR merge-queue board**.
 
 ## What Terraform owns vs. what stays manual
 
-Terraform can only manage the **wiring** on the `gh-portfolio-ops` repo—the Actions variable and secret that the automation reads. The board itself, its board layout, and the PAT value are UI-only: the `integrations/github` provider has no Projects V2 resource, and a PAT can only be minted in the GitHub UI.
+Terraform can only manage the **wiring** on the `gh-portfolio-ops` repo—the Actions variable and secret that the automation reads. The board itself, its grouped-by-status view, and the PAT value are UI-only: the `integrations/github` provider has no Projects V2 resource, and a PAT can only be minted in the GitHub UI.
 
 | Step | Where | Owner |
 |---|---|---|
 | 1. Create the `gh-portfolio-ops` repo (its `bootstrap.sh`) | local shell | **manual (you)** |
 | 2. Adopt the repo into `terraform/repos` via `terraform import` | local shell | **manual (you), one-time** |
 | 3. Create the Projects V2 board ("PR Merge Queue") | `https://github.com/users/nolte/projects/new` | **manual (you)** |
-| 4. Configure the board's "grouped by Status" board layout | board UI | **manual (you)** |
+| 4. Configure the board's "grouped by Status" board view | board UI | **manual (you)** |
 | 5. Mint the merge-queue PAT | GitHub UI (Developer settings) | **manual (you)** |
 | 6. Persist the PAT in gopass | local shell | **manual (you), one-time** |
 | 7. Set `project_number` in `terraform.tfvars` | local file (git-ignored) | **manual (you)** |

@@ -5,7 +5,7 @@ module. A repository receives the shared Sigstore signing key only when its
 entry in `terraform.tfvars` sets `system_image_signing = true`; every other
 repository is left untouched.
 
-Every repository that publishes a system image signs it with the
+Every repository that publishes a bootc system image signs it with the
 **same** key. The key is created once by the operator, stored in gopass, and
 distributed from here. Terraform never creates the key and never reads it
 from a file in this repository.

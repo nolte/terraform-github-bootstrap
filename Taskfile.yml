@@ -22,6 +22,8 @@ tasks:
       - .vale.ini
     status:
       - test -d .github/styles/Microsoft
+      - test -d .github/styles/RedHat
+      - test -d .github/styles/config/vocabularies/technical
     cmds:
       - vale sync
 
